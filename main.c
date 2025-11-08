@@ -1,9 +1,5 @@
 #include "connect4.h"
 
-#define EMPTY_CELL '-'
-#define PLAYER_CELL 'X'
-#define AI_CELL 'O'
-
 void close_all(t_connect4 *game)
 {
     ft_free_char_mat(game->board);
@@ -27,6 +23,7 @@ void alloc_board(t_connect4 *game)
         game->status = error;
         close_all(game);
     }
+
 	game->board[game->rows] = NULL;
 
     for (i = 0; i < game->rows; i++) {
@@ -82,6 +79,50 @@ void player_turn(t_connect4 *game)
 	}
 }
 
+void close_all(t_connect4 *game)
+{
+    ft_free_char_mat(game->board);
+    exit(game->status);
+}
+
+void draw_board(t_connect4 *game)
+{
+    int i, j;
+    // ' ', 'O', 'X'
+    
+    ft_printf("┌");
+    for (j = 0; j < game->columns - 1; j++) {
+        ft_printf("──┬");
+    }
+    ft_printf("──┐\n");
+    for (i = 0; i < game->rows; i++) {
+        ft_printf("│");
+        for (j = 0; j < game->columns; j++) {
+            if (game->board[i][j] == 'o')
+            ft_printf("🔴│");
+            else if (game->board[i][j] == 'x')
+            ft_printf("🟡│");
+            else if (game->board[i][j] == ' ')
+            ft_printf("  │");
+            else
+            ft_printf("  │", game->board[i][j]);
+        }
+        ft_printf("\n");
+        if (i != game->rows - 1) {
+            ft_printf("├");
+            for (j = 0; j < game->columns - 1; j++) {
+                ft_printf("──┼");
+            }
+            ft_printf("──┤\n");
+        }
+    }
+    ft_printf("└");
+    for (j = 0; j < game->columns - 1; j++) {
+        ft_printf("──┴");
+    }
+    ft_printf("──┘\n");
+}
+
 int main(int argc, char *argv[])
 {
     if (argc != 3) {
@@ -99,19 +140,27 @@ int main(int argc, char *argv[])
     game.rows = ft_atoi(argv[1]); //altezza
     game.columns = ft_atoi(argv[2]); //larghezza
 
-	init_board(&game);
-	game.status = ongoing;
+    init_board(&game);
+    game.status = ongoing;
     while (game.status == ongoing)
     {
 		draw_board(&game);
 
 		player_turn(&game);
 		//prendere input dai giocatori
+
+    // while (game.status == ongoing)
+    // {
+        //draw_board(&game);
+        //draw game board here
+
+        //prendere input dai giocatori
+
         //ia
 
         //calcolare dove inserire il gettone (calcolare la riga ultima libera)
         //calcolare vittoria o pareggio
-    }
 
+    }
     return 0;
 }
