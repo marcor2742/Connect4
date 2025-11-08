@@ -21,6 +21,8 @@ int make_move(t_connect4 *game, int col, char symbol)
     for (int row = game->rows - 1; row >= 0; --row) {
         if (game->board[row][col] == EMPTY_CELL) {
             game->board[row][col] = symbol;
+            game->last_move.row = row;
+            game->last_move.column = col;
             return row;
         }
     }
@@ -40,28 +42,28 @@ int board_full(t_connect4 *game)
     return 1;
 }
 
-static int check_direction(t_connect4 *game, int r, int c, int dr, int dc, char s)
-{
-    for (int i = 0; i < 4; ++i) {
-        int rr = r + i*dr, cc = c + i*dc;
-        if (!in_bounds(game, rr, cc) || game->board[rr][cc] != s) return 0;
-    }
-    return 1;
-}
+// static int check_direction(t_connect4 *game, int r, int c, int dr, int dc, char s)
+// {
+//     for (int i = 0; i < 4; ++i) {
+//         int rr = r + i*dr, cc = c + i*dc;
+//         if (!in_bounds(game, rr, cc) || game->board[rr][cc] != s) return 0;
+//     }
+//     return 1;
+// }
 
-int check_win_for(t_connect4 *game, char s)
-{
-    for (int r = 0; r < game->rows; ++r) {
-        for (int c = 0; c < game->columns; ++c) {
-            if (game->board[r][c] != s) continue;
-            if (check_direction(game, r, c, 0, 1, s)) return 1;
-            if (check_direction(game, r, c, 1, 0, s)) return 1;
-            if (check_direction(game, r, c, 1, 1, s)) return 1;
-            if (check_direction(game, r, c, 1, -1, s)) return 1;
-        }
-    }
-    return 0;
-}
+// int check_win_for(t_connect4 *game, char s)
+// {
+//     for (int r = 0; r < game->rows; ++r) {
+//         for (int c = 0; c < game->columns; ++c) {
+//             if (game->board[r][c] != s) continue;
+//             if (check_direction(game, r, c, 0, 1, s)) return 1;
+//             if (check_direction(game, r, c, 1, 0, s)) return 1;
+//             if (check_direction(game, r, c, 1, 1, s)) return 1;
+//             if (check_direction(game, r, c, 1, -1, s)) return 1;
+//         }
+//     }
+//     return 0;
+// }
 
 /* scoring di una finestra di 4 */
 static int score_window(char a, char b, char c, char d, char ai, char pl)
@@ -121,8 +123,8 @@ int evaluate(t_connect4 *game)
 
 static int minimax_ab(t_connect4 *game, int depth, int alpha, int beta, int maximizing)
 {
-    if (check_win_for(game, AI_CELL)) return  WIN_SCORE;
-    if (check_win_for(game, PLAYER_CELL)) return -WIN_SCORE;
+    if (check_win(game)) return  WIN_SCORE;
+    if (check_win(game)) return -WIN_SCORE;
     if (depth == 0 || board_full(game)) return evaluate(game);
 
     if (maximizing) {
@@ -154,7 +156,7 @@ static int minimax_ab(t_connect4 *game, int depth, int alpha, int beta, int maxi
     }
 }
 
-int ai_choose_column(t_connect4 *game, int depth)
+void ai_choose_column(t_connect4 *game, int depth)
 {
     int best_col = -1;
     int best_score = INT_MIN;
@@ -169,6 +171,10 @@ int ai_choose_column(t_connect4 *game, int depth)
             best_col = col;
         }
     }
-    return best_col;
+    // return best_col;
+    if (best_col >= 0) {
+        int r = make_move(game, best_col, AI_CELL);
+        (void)r;
+    }
 }
 // ...existing code...

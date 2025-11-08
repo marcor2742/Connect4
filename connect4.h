@@ -44,10 +44,10 @@ void undo_move(t_connect4 *game, int row, int col);
 int check_win_for(t_connect4 *game, char symbol);
 int board_full(t_connect4 *game);
 int evaluate(t_connect4 *game);
-int ai_choose_column(t_connect4 *game, int depth);
+void ai_choose_column(t_connect4 *game, int depth);
 
-int count_direction(t_connect4 *game, int row, int col, int dr, int dc, char player);
-void check_win(t_connect4 *game);
+int check_win(t_connect4 *game);
+void check_result(t_connect4 *game);
 void player_turn(t_connect4 *game);
 
 

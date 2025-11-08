@@ -1,7 +1,7 @@
 # include "connect4.h"
 # include <stdbool.h>
 
-int count_direction(t_connect4 *game, int row, int col, int dr, int dc, char player)
+static int count_direction(t_connect4 *game, int row, int col, int dr, int dc, char player)
 {
     int count = 0;
     int r = row + dr;
@@ -15,7 +15,50 @@ int count_direction(t_connect4 *game, int row, int col, int dr, int dc, char pla
     return count;
 }
 
-void check_win(t_connect4 *game)
+// void check_win(t_connect4 *game)
+// {
+//     int row = game->last_move.row;
+//     int col = game->last_move.column;
+//     char player = game->board[row][col];
+ 
+//     int directions[4][2] = {
+//         {0, 1},
+//         {1, 0},
+//         {1, 1},
+//         {1, -1}
+//     };
+    
+//     for (int d = 0; d < 4; d++)
+//     {
+//         int count = 1;
+//         int dr = directions[d][0];
+//         int dc = directions[d][1];
+        
+//         count += count_direction(game, row, col, dr, dc, player);
+//         count += count_direction(game, row, col, -dr, -dc, player);
+        
+//         if (count >= 4)
+//         {
+//             if (player == PLAYER_CELL)
+//                 game->status = win;
+//             else if (player == AI_CELL)
+//                 game->status = lose;
+//             return;
+//         }
+//     }
+
+//     bool full = true;
+//     for (int j = 0; j < game->columns; j++) {
+//         if (game->board[0][j] == EMPTY_CELL) {
+//             full = false;
+//             break;
+//         }
+//     }
+//     if (full)
+//         game->status = draw;
+// }
+
+int check_win(t_connect4 *game)
 {
     int row = game->last_move.row;
     int col = game->last_move.column;
@@ -38,13 +81,21 @@ void check_win(t_connect4 *game)
         count += count_direction(game, row, col, -dr, -dc, player);
         
         if (count >= 4)
-        {
-            if (player == PLAYER_CELL)
-                game->status = win;
-            else if (player == AI_CELL)
-                game->status = lose;
-            return;
-        }
+            return 1;
+    }
+
+    return 0;
+}
+
+void check_result(t_connect4 *game)
+{
+    if (check_win(game))
+    {
+        if (game->board[game->last_move.row][game->last_move.column] == PLAYER_CELL)
+            game->status = win;
+        else if (game->board[game->last_move.row][game->last_move.column] == AI_CELL)
+            game->status = lose;
+        return;
     }
 
     bool full = true;
@@ -59,18 +110,17 @@ void check_win(t_connect4 *game)
 }
 
 
-
-static void make_move(t_connect4 *game, int columnIndex)
-{
-	for (int i = game->rows - 1; i >= 0; i--) {
-		if (game->board[i][columnIndex - 1] == EMPTY_CELL) {
-			game->board[i][columnIndex - 1] = PLAYER_CELL;
-			game->last_move.row = i;
-			game->last_move.column = columnIndex - 1;
-			break;
-		}
-	}
-}
+// static void move_player(t_connect4 *game, int columnIndex)
+// {
+// 	for (int i = game->rows - 1; i >= 0; i--) {
+// 		if (game->board[i][columnIndex - 1] == EMPTY_CELL) {
+// 			game->board[i][columnIndex - 1] = PLAYER_CELL;
+// 			game->last_move.row = i;
+// 			game->last_move.column = columnIndex - 1;
+// 			break;
+// 		}
+// 	}
+// }
 
 void player_turn(t_connect4 *game)
 {
@@ -95,5 +145,6 @@ void player_turn(t_connect4 *game)
 			close_all(game);
 		}
 	}
-	make_move(game, columnIndex);
+	make_move(game, columnIndex - 1, PLAYER_CELL);
+
 }
