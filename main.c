@@ -123,11 +123,59 @@ void draw_board(t_connect4 *game)
     ft_printf("──┘\n");
 }
 
+// void draw
+
+void draw_in_window(t_connect4 *game, SDL_Renderer *renderer)
+{
+    int width;
+    int height;
+
+    SDL_GetCurrentRenderOutputSize(renderer, &width, &height);
+
+    int cell_w = width / game->columns;
+    int cell_h = height / game->rows;
+    const int pad = 4;
+
+    SDL_SetRenderDrawColor(renderer, 20, 20, 20, 255);
+    SDL_RenderClear(renderer);
+
+    for (int i = 0; i < game->rows; i++)
+    {
+        for (int j = 0; j < game->columns; j++)
+        {
+            SDL_FRect cell;
+            cell.x = j * cell_w + pad;
+            cell.y = i * cell_h + pad;
+            cell.w = cell_w - pad * 2;
+            cell.h = cell_h - pad * 2;
+
+            /* fill empty cell */
+            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+            SDL_RenderFillRect(renderer, &cell);
+
+            /* cell border */
+            SDL_SetRenderDrawColor(renderer, 200, 200, 200, 255);
+            SDL_FRect border = { j * cell_w, i * cell_h, cell_w, cell_h };
+            SDL_RenderRect(renderer, &border);
+        }
+    }
+    SDL_RenderPresent(renderer);
+}
+
 int main(int argc, char *argv[])
 {
-    if (argc != 3) {
+    SDL_Window *window;
+    SDL_Renderer *renderer;
+    bool has_graphics = false;
+
+    if ((argc < 3) || (argc > 4)) {
         ft_printf("Usage: <rows> <columns>\n");
         return 1;
+    }
+
+    if (argc == 4)
+    {
+        has_graphics = true;
     }
 
     t_connect4 game;
@@ -146,16 +194,68 @@ int main(int argc, char *argv[])
 
     init_board(&game);
     game.status = ongoing;
+
+    ///////////////////////////////////////////////////////////////////////
+    if (has_graphics)
+    {
+        SDL_Init(SDL_INIT_VIDEO);   // Initialize SDL3
+        
+        // Create an application window with the following settings:
+        window = SDL_CreateWindow(
+            "Connect4",                  // window title
+            game.columns * 50,           // width, in pixels
+            game.rows * 50,              // height, in pixels
+            SDL_WINDOW_OPENGL            // flags - see below
+        );
+
+        renderer = SDL_CreateRenderer(window, NULL);
+
+        if (renderer == NULL) {
+            SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Could not create renderer: %s\n", SDL_GetError());
+            SDL_DestroyWindow(window);
+            SDL_Quit();
+            return 1;
+        }
+        
+        // Check that the window was successfully created
+        if (window == NULL) {
+            // In the case that the window could not be made...
+            SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Could not create window: %s\n", SDL_GetError());
+            return 1;
+        }
+    }
+    //////////////////////////////////////////////////////////////////////
+
     while (game.status == ongoing)
     {
-		draw_board(&game);
+        SDL_Event event;
+
+        while (SDL_PollEvent(&event))
+        {
+            if (event.type == SDL_EVENT_QUIT)
+            {
+                game.status = error;
+                close_all(&game);
+            }
+        }
+
+        if (!has_graphics)
+		    draw_board(&game);
+        else
+            draw_in_window(&game, renderer);
 
 		//prendere input dai giocatori
-		player_turn(&game);
+		if (!has_graphics)
+            player_turn(&game);
         //ia
 
         //calcolare vittoria o pareggio
+    }
 
+    SDL_DestroyWindow(window);
+    if (has_graphics)
+    {
+        SDL_Quit();
     }
     return 0;
 }

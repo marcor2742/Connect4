@@ -3,6 +3,10 @@
 
 # include "libft/include/libft.h"
 //# include "libft.h"
+
+#include <SDL3/SDL.h>
+#include <SDL3/SDL_main.h>
+
 #define MAX_ROWS 100
 #define MAX_COLUMNS 100
 
