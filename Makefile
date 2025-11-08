@@ -11,7 +11,13 @@ SDL_LIB = -L$(SDL_DIR) -lSDL3
 
 LDFLAGS = $(SDL_LIB) -Wl,-rpath,'$$ORIGIN/SDL/build'
 
-SRCS = main.c
+SDL_DIR = SDL/build
+SDL_INC = -ISDL/include
+SDL_LIB = -L$(SDL_DIR) -lSDL3
+
+LDFLAGS = $(SDL_LIB) -Wl,-rpath,'$$ORIGIN/SDL/build'
+
+SRCS = main.c player.c ai.c
 HEADERS = connect4.h
 
 all: $(SDL_DIR) $(NAME)
@@ -42,8 +48,8 @@ fclean: clean
 
 re: fclean all
 
-debug: fclean $(LIBFT)
-	@$(CC) $(CFLAGS) -g $(SRCS) $(LIBFT) -o $(NAME)
+debug: fclean
+	@$(CC) $(CCFLAGS) -g $(SRCS) -o $(NAME)
 
 .PHONY: all clean fclean re debug
 .SILENT:

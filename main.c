@@ -6,13 +6,6 @@ void close_all(t_connect4 *game)
     exit(game->status == error ? 1 : 0);
 }
 
-// void	draw_board(t_connect4 *game)
-// {
-// 	for (int i = 0; i < game->rows; i++) {
-// 		ft_printf("%s\n", game->board[i]);
-// 	}
-// }
-
 void alloc_board(t_connect4 *game)
 {
     int i;
@@ -48,10 +41,10 @@ void init_board(t_connect4 *game)
 
 }
 
-void player_turn(t_connect4 *game)
-{
-	int column;
-	char *line = NULL;
+// void player_turn(t_connect4 *game)
+// {
+// 	int column;
+// 	char *line = NULL;
 
 	while (1) {
 		ft_printf("Inserisci la colonna (1-%d): ", game->columns);
@@ -138,6 +131,7 @@ void draw_board(t_connect4 *game)
 {
     int i, j;
     // ' ', 'O', 'X'
+	// inserire numeri colonne
     
     ft_printf("┌");
     for (j = 0; j < game->columns - 1; j++) {
@@ -237,16 +231,16 @@ int main(int argc, char *argv[])
     t_connect4 game;
 
     if (ft_atoi(argv[1]) < 6 || ft_atoi(argv[2]) < 7) {
-        ft_printf("Error: Minimum size is 6 rows and 7 columns.\n");
+        ft_printf("Error: Size must be integers (rows) >= 6 and (columns) >= 7.\n");
         return 1;
     }
 
     game.rows = ft_atoi(argv[1]); //altezza
     game.columns = ft_atoi(argv[2]); //larghezza
-	if (game.rows > MAX_ROWS || game.columns > MAX_COLUMNS) {
-		ft_printf("Error: Maximum size is %d rows and %d columns.\n", MAX_ROWS, MAX_COLUMNS);
-		return 1;
-	}
+	// if (game.rows > MAX_ROWS || game.columns > MAX_COLUMNS) {
+	// 	ft_printf("Error: Maximum size is %d rows and %d columns.\n", MAX_ROWS, MAX_COLUMNS);
+	// 	return 1;
+	// }
 
     init_board(&game);
     game.status = ongoing;
@@ -302,6 +296,27 @@ int main(int argc, char *argv[])
             draw_in_window(&game, renderer);
 
 		//prendere input dai giocatori
+		player_turn(&game);
+
+    	draw_board(&game);
+        check_result(&game);
+        if (game.status != ongoing)
+            break;
+
+        ai_choose_column(&game, 2); // depth = 2 example
+
+		check_result(&game);
+    }
+
+	draw_board(&game);
+	if (game.status == win)
+		ft_printf("You win!\n");
+	else if (game.status == lose)
+		ft_printf("You lose!\n");
+	else if (game.status == draw)
+		ft_printf("It's a draw!\n");
+	
+	close_all(&game);
 		if (!has_graphics)
             player_turn(&game);
         else
