@@ -1,6 +1,7 @@
 NAME = Connect4
 CC = cc
-CFLAGS = -Wall -Wextra -Werror -I$(LIBFT_DIR)/include $(SDL_INC) -g
+CFLAGS = -Wall -Wextra -Werror -I$(LIBFT_DIR)/include $(SDL_INC) -g -fsanitize=leak
+#-fsanitize=memory
 
 LIBFT_DIR = ./libft
 LIBFT = ./libft/libft.a

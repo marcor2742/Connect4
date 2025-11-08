@@ -31,6 +31,9 @@ typedef struct  s_move
 
 typedef struct  s_connect4
 {
+    SDL_Window *window;
+    SDL_Renderer *renderer;
+    bool has_graphics;
     int rows;
     int columns;
     char **board;

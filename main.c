@@ -2,6 +2,13 @@
 
 void close_all(t_connect4 *game)
 {
+    if (game->has_graphics) {
+        if (game->renderer)
+            SDL_DestroyRenderer(game->renderer);
+        if (game->window)
+            SDL_DestroyWindow(game->window);
+        SDL_Quit();
+    }
     ft_free_char_mat(game->board);
     exit(game->status == error ? 1 : 0);
 }
@@ -183,7 +190,7 @@ void draw_in_window(t_connect4 *game, SDL_Renderer *renderer)
     SDL_SetRenderDrawColor(renderer, 20, 20, 20, 255);
     SDL_RenderClear(renderer);
 
-    draw_board(game);
+    // draw_board(game);
 
     for (int i = 0; i < game->rows; i++)
     {
@@ -218,18 +225,9 @@ void draw_in_window(t_connect4 *game, SDL_Renderer *renderer)
 
 int main(int argc, char *argv[])
 {
-    SDL_Window *window;
-    SDL_Renderer *renderer;
-    bool has_graphics = false;
-
     if ((argc < 3) || (argc > 4)) {
         ft_printf("Usage: <rows> <columns>\n");
         return 1;
-    }
-
-    if (argc == 4)
-    {
-        has_graphics = true;
     }
 
     t_connect4 game;
@@ -250,30 +248,39 @@ int main(int argc, char *argv[])
     game.status = ongoing;
     game.hovered = 1;
 
+    game.window = NULL;
+    game.renderer = NULL;
+    game.has_graphics = false;
+
+    if (argc == 4)
+    {
+        game.has_graphics = true;
+    }
+
     ///////////////////////////////////////////////////////////////////////
-    if (has_graphics)
+    if (game.has_graphics)
     {
         SDL_Init(SDL_INIT_VIDEO);   // Initialize SDL3
         
         // Create an application window with the following settings:
-        window = SDL_CreateWindow(
+        game.window = SDL_CreateWindow(
             "Connect4",                  // window title
             game.columns * 50,           // width, in pixels
             game.rows * 50,              // height, in pixels
             SDL_WINDOW_OPENGL            // flags - see below
         );
 
-        renderer = SDL_CreateRenderer(window, NULL);
+        game.renderer = SDL_CreateRenderer(game.window, NULL);
 
-        if (renderer == NULL) {
+        if (game.renderer == NULL) {
             SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Could not create renderer: %s\n", SDL_GetError());
-            SDL_DestroyWindow(window);
+            SDL_DestroyWindow(game.window);
             SDL_Quit();
             return 1;
         }
         
         // Check that the window was successfully created
-        if (window == NULL) {
+        if (game.window == NULL) {
             // In the case that the window could not be made...
             SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Could not create window: %s\n", SDL_GetError());
             return 1;
@@ -283,27 +290,27 @@ int main(int argc, char *argv[])
 
     while (game.status == ongoing)
     {
-        SDL_Event event;
+        //SDL_Event event;
 
-        while (SDL_PollEvent(&event))
-        {
-            if (event.type == SDL_EVENT_QUIT)
-            {
-                game.status = error;
-                close_all(&game);
-            }
-        }
+        // while (SDL_PollEvent(&event))
+        // {
+        //     if (event.type == SDL_EVENT_QUIT)
+        //     {
+        //         game.status = error;
+        //         close_all(&game);
+        //     }
+        // }
 
-        if (!has_graphics)
+        if (!game.has_graphics)
 		    draw_board(&game);
         else
-            draw_in_window(&game, renderer);
+            draw_in_window(&game, game.renderer);
 
 		//prendere input dai giocatori
-        if (!has_graphics)
+        if (!game.has_graphics)
 		    player_turn(&game);
         else
-            player_turn_graphics(&game, renderer);
+            player_turn_graphics(&game, game.renderer);
 
     	//draw_board(&game);
         check_result(&game);
@@ -325,11 +332,5 @@ int main(int argc, char *argv[])
 	
 	close_all(&game);
 
-    SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(window);
-    if (has_graphics)
-    {
-        SDL_Quit();
-    }
     return 0;
 }
