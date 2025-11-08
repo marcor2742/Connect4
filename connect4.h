@@ -6,6 +6,9 @@
 
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
+#include <stdlib.h>
+#include <time.h>
+
 
 #define MAX_ROWS 100
 #define MAX_COLUMNS 100
@@ -23,6 +26,12 @@ typedef enum    e_status
     error
 }               e_status;
 
+typedef enum e_turn
+{
+    PLAYER,
+	AI
+}	t_turn;
+
 typedef struct  s_move
 {
 	int row;
@@ -38,6 +47,7 @@ typedef struct  s_connect4
     int columns;
     char **board;
     int hovered;
+    t_turn current_turn;
     t_move last_move;
     e_status status;
 }               t_connect4;

@@ -48,43 +48,6 @@ void init_board(t_connect4 *game)
 
 }
 
-// void player_turn(t_connect4 *game)
-// {
-// 	int column;
-// 	char *line = NULL;
-
-// 	while (1) {
-// 		ft_printf("Inserisci la colonna (1-%d): ", game->columns);
-// 		if ((line = get_next_line(0)) != NULL)
-// 		{
-// 			column = ft_atoi(line);
-// 			free(line);
-// 			if (column >= 1 && column <= game->columns && game->board[0][column - 1] == EMPTY_CELL)
-// 				break;
-// 			else
-// 				ft_printf("Colonna non valida. Riprova.\n");
-// 		}
-// 		else
-// 		{
-// 			ft_printf("\n");
-// 			game->status = error;
-// 			close_all(game);
-// 		}
-// 	}
-//     // if (!line)
-//     // {
-//     //     ft_printf("\n");
-//     //     game->status = error;
-//     //     close_all(game);
-//     // }
-// 	for (int i = game->rows - 1; i >= 0; i--) {
-// 		if (game->board[i][column - 1] == EMPTY_CELL) {
-// 			game->board[i][column - 1] = PLAYER_CELL;
-// 			break;
-// 		}
-// 	}
-// }
-
 void player_turn_graphics(t_connect4 *game, SDL_Renderer *renderer)
 {
 	while (1)
@@ -172,6 +135,17 @@ void draw_board(t_connect4 *game)
         ft_printf("──┴");
     }
     ft_printf("──┘\n");
+
+    // Print column numbers
+    ft_printf(" ");
+    for (j = 1; j <= game->columns; j++) {
+        ft_printf("%d", j);
+        if (j < 10)
+            ft_printf("  ");
+        else
+            ft_printf(" ");
+    }
+    ft_printf("\n");
 }
 
 // void draw
@@ -245,7 +219,16 @@ int main(int argc, char *argv[])
 	// }
 
     init_board(&game);
+
+	srand(time(NULL));
+	game.current_turn = (rand() % 2 == 0) ? PLAYER : AI;
+
+	if (game.current_turn == PLAYER)
+        ft_printf("Inizi tu! 🔴\n");
+    else
+        ft_printf("Inizia l'IA! 🟡\n");
     game.status = ongoing;
+
     game.hovered = 1;
 
     game.window = NULL;
@@ -307,22 +290,35 @@ int main(int argc, char *argv[])
             draw_in_window(&game, game.renderer);
 
 		//prendere input dai giocatori
-        if (!game.has_graphics)
-		    player_turn(&game);
-        else
-            player_turn_graphics(&game, game.renderer);
+//         if (!game.has_graphics)
+// 		        player_turn(&game);
+//         else
+//             player_turn_graphics(&game, game.renderer);
 
     	//draw_board(&game);
-        check_result(&game);
-        if (game.status != ongoing)
-            break;
+//         check_result(&game);
+//         if (game.status != ongoing)
+//             break;
 
-        ai_choose_column(&game, 2); // depth = 2 example
+//         ai_choose_column(&game, 2); // depth = 2 example
+		if (game.current_turn == PLAYER) {
+			//player_turn(&game);
+        if (!game.has_graphics)
+		        player_turn(&game);
+        else
+            player_turn_graphics(&game, game.renderer);
+			game.current_turn = AI;
+		}
+		else {
+			ai_choose_column(&game, 2); // depth = 2 example
+			game.current_turn = PLAYER;
+		}
 
 		check_result(&game);
     }
 
 	draw_board(&game);
+
 	if (game.status == win)
 		ft_printf("You win!\n");
 	else if (game.status == lose)
