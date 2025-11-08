@@ -71,6 +71,12 @@ void player_turn(t_connect4 *game)
 			close_all(game);
 		}
 	}
+    // if (!line)
+    // {
+    //     ft_printf("\n");
+    //     game->status = error;
+    //     close_all(game);
+    // }
 	for (int i = game->rows - 1; i >= 0; i--) {
 		if (game->board[i][column - 1] == EMPTY_CELL) {
 			game->board[i][column - 1] = PLAYER_CELL;
@@ -83,7 +89,6 @@ void draw_board(t_connect4 *game)
 {
     int i, j;
     // ' ', 'O', 'X'
-	// inserire numeri colonne
     
     ft_printf("┌");
     for (j = 0; j < game->columns - 1; j++) {

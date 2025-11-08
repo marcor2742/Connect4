@@ -1,12 +1,12 @@
 NAME = Connect4
 CC = cc
-CFLAGS = -Wall -Wextra -Werror
+CFLAGS = -Wall -Wextra -Werror -I$(LIBFT_DIR)/include
 
 LIBFT_DIR = ./libft
 LIBFT = ./libft/libft.a
 
 SRCS = main.c
-HEADERS = 
+HEADERS = connect4.h
 
 all: $(NAME)
 
@@ -29,8 +29,8 @@ fclean: clean
 
 re: fclean all
 
-debug: fclean
-	@$(CC) $(CCFLAGS) -g $(SRCS) -o $(NAME)
+debug: fclean $(LIBFT)
+	@$(CC) $(CFLAGS) -g $(SRCS) $(LIBFT) -o $(NAME)
 
 .PHONY: all clean fclean re debug
 .SILENT:
