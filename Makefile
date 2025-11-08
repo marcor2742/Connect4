@@ -21,6 +21,7 @@ $(LIBFT):
 	@$(MAKE) -C $(LIBFT_DIR) --quiet
 
 $(SDL_DIR):
+	@git clone https://github.com/libsdl-org/SDL.git
 	@echo "Building SDL"
 	@mkdir -p $(SDL_DIR)
 	@cmake -S SDL -B $(SDL_DIR) -DSDL_SHARED=ON

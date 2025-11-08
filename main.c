@@ -150,7 +150,10 @@ void draw_in_window(t_connect4 *game, SDL_Renderer *renderer)
             cell.h = cell_h - pad * 2;
 
             /* fill empty cell */
-            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+            if (j + 1 == game->hovered)
+                SDL_SetRenderDrawColor(renderer, 100, 100, 100, 255);
+            else
+                SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
             SDL_RenderFillRect(renderer, &cell);
 
             /* cell border */
@@ -194,6 +197,7 @@ int main(int argc, char *argv[])
 
     init_board(&game);
     game.status = ongoing;
+    game.hovered = 1;
 
     ///////////////////////////////////////////////////////////////////////
     if (has_graphics)
@@ -236,6 +240,34 @@ int main(int argc, char *argv[])
             {
                 game.status = error;
                 close_all(&game);
+            }
+            if (event.type == SDL_EVENT_KEY_DOWN)
+            {
+                // switch (event.key.key)
+                // {
+                //     case SDLK_RIGHT:
+                //     {
+                //         if (game.hovered < game.columns)
+                //             game.hovered++;
+
+                //     }
+                //     case SDLK_LEFT:
+                //     {
+                //         if (game.hovered > 1)
+                //             game.hovered--;
+                //     }
+                // }
+                SDL_Log("key pressed: %d", event.key.key);
+                if (event.key.key == 1073741903) // right
+                {
+                    if (game.hovered < game.columns)
+                             game.hovered++;
+                }
+                if (event.key.key == 1073741904) // left
+                {
+                    if (game.hovered > 1)
+                           game.hovered--;
+                }
             }
         }
 

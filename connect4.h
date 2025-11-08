@@ -28,6 +28,7 @@ typedef struct  s_connect4
     int rows;
     int columns;
     char **board;
+    int hovered;
     e_status status;
 }               t_connect4;
 
