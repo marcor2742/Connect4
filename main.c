@@ -317,14 +317,6 @@ int main(int argc, char *argv[])
 		ft_printf("It's a draw!\n");
 	
 	close_all(&game);
-		if (!has_graphics)
-            player_turn(&game);
-        else
-            player_turn_graphics(&game, renderer);
-        //ia
-
-        //calcolare vittoria o pareggio
-    }
 
     SDL_DestroyWindow(window);
     if (has_graphics)
