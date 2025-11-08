@@ -133,16 +133,16 @@ int main(int argc, char *argv[])
     t_connect4 game;
 
     if (ft_atoi(argv[1]) < 6 || ft_atoi(argv[2]) < 7) {
-        ft_printf("Error: Minimum size is 6 rows and 7 columns.\n");
+        ft_printf("Error: Size must be integers (rows) >= 6 and (columns) >= 7.\n");
         return 1;
     }
 
     game.rows = ft_atoi(argv[1]); //altezza
     game.columns = ft_atoi(argv[2]); //larghezza
-	if (game.rows > MAX_ROWS || game.columns > MAX_COLUMNS) {
-		ft_printf("Error: Maximum size is %d rows and %d columns.\n", MAX_ROWS, MAX_COLUMNS);
-		return 1;
-	}
+	// if (game.rows > MAX_ROWS || game.columns > MAX_COLUMNS) {
+	// 	ft_printf("Error: Maximum size is %d rows and %d columns.\n", MAX_ROWS, MAX_COLUMNS);
+	// 	return 1;
+	// }
 
     init_board(&game);
     game.status = ongoing;
@@ -154,8 +154,17 @@ int main(int argc, char *argv[])
 		player_turn(&game);
         //ia
 
-        //calcolare vittoria o pareggio
-
+		check_win(&game);
     }
+
+	draw_board(&game);
+	if (game.status == win)
+		ft_printf("You win!\n");
+	else if (game.status == lose)
+		ft_printf("You lose!\n");
+	else if (game.status == draw)
+		ft_printf("It's a draw!\n");
+	
+	close_all(&game);
     return 0;
 }
