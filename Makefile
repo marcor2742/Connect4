@@ -1,6 +1,6 @@
 NAME = Connect4
 CC = cc
-CFLAGS = -Wall -Wextra -Werror -I$(LIBFT_DIR)/include $(SDL_INC)
+CFLAGS = -Wall -Wextra -Werror -I$(LIBFT_DIR)/include $(SDL_INC) -g
 
 LIBFT_DIR = ./libft
 LIBFT = ./libft/libft.a

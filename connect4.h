@@ -35,6 +35,7 @@ typedef struct  s_connect4
     int columns;
     char **board;
     int hovered;
+    t_move last_move;
     e_status status;
 }               t_connect4;
 

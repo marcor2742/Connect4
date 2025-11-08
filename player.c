@@ -62,7 +62,13 @@ int check_win(t_connect4 *game)
 {
     int row = game->last_move.row;
     int col = game->last_move.column;
-    char player = game->board[row][col];
+    char player;
+    
+    draw_board(game);
+    ft_printf("row: %d\n", row);
+    ft_printf("col: %d\n", col);
+    player = game->board[row][col];
+
  
     int directions[4][2] = {
         {0, 1},
@@ -146,5 +152,4 @@ void player_turn(t_connect4 *game)
 		}
 	}
 	make_move(game, columnIndex - 1, PLAYER_CELL);
-
 }
