@@ -146,5 +146,4 @@ void player_turn(t_connect4 *game)
 		}
 	}
 	make_move(game, columnIndex - 1, PLAYER_CELL);
-
 }
