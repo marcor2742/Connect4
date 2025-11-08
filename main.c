@@ -6,12 +6,12 @@ void close_all(t_connect4 *game)
     exit(game->status);
 }
 
-void	draw_board(t_connect4 *game)
-{
-	for (int i = 0; i < game->rows; i++) {
-		ft_printf("%s\n", game->board[i]);
-	}
-}
+// void	draw_board(t_connect4 *game)
+// {
+// 	for (int i = 0; i < game->rows; i++) {
+// 		ft_printf("%s\n", game->board[i]);
+// 	}
+// }
 
 void alloc_board(t_connect4 *game)
 {
@@ -63,14 +63,14 @@ void player_turn(t_connect4 *game)
 				break;
 			}
 		}
-		if (!line)
-		{
-			ft_printf("\n");
-			game->status = error;
-			close_all(game);
-		}
-		ft_printf("Colonna non valida. Riprova.\n");
+        ft_printf("Colonna non valida. Riprova.\n");
 	}
+    // if (!line)
+    // {
+    //     ft_printf("\n");
+    //     game->status = error;
+    //     close_all(game);
+    // }
 	for (int i = game->rows - 1; i >= 0; i--) {
 		if (game->board[i][column - 1] == EMPTY_CELL) {
 			game->board[i][column - 1] = PLAYER_CELL;
@@ -79,11 +79,11 @@ void player_turn(t_connect4 *game)
 	}
 }
 
-void close_all(t_connect4 *game)
-{
-    ft_free_char_mat(game->board);
-    exit(game->status);
-}
+// void close_all(t_connect4 *game)
+// {
+//     ft_free_char_mat(game->board);
+//     exit(game->status);
+// }
 
 void draw_board(t_connect4 *game)
 {
@@ -98,11 +98,11 @@ void draw_board(t_connect4 *game)
     for (i = 0; i < game->rows; i++) {
         ft_printf("│");
         for (j = 0; j < game->columns; j++) {
-            if (game->board[i][j] == 'o')
+            if (game->board[i][j] == PLAYER_CELL)
             ft_printf("🔴│");
-            else if (game->board[i][j] == 'x')
+            else if (game->board[i][j] == AI_CELL)
             ft_printf("🟡│");
-            else if (game->board[i][j] == ' ')
+            else if (game->board[i][j] == EMPTY_CELL)
             ft_printf("  │");
             else
             ft_printf("  │", game->board[i][j]);
@@ -146,19 +146,10 @@ int main(int argc, char *argv[])
     {
 		draw_board(&game);
 
-		player_turn(&game);
 		//prendere input dai giocatori
-
-    // while (game.status == ongoing)
-    // {
-        //draw_board(&game);
-        //draw game board here
-
-        //prendere input dai giocatori
-
+		player_turn(&game);
         //ia
 
-        //calcolare dove inserire il gettone (calcolare la riga ultima libera)
         //calcolare vittoria o pareggio
 
     }
