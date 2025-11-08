@@ -5,8 +5,8 @@ CFLAGS = -Wall -Wextra -Werror -I$(LIBFT_DIR)/include
 LIBFT_DIR = ./libft
 LIBFT = ./libft/libft.a
 
-SRCS = main.c player.c
-HEADERS = 
+SRCS = main.c player.c ai.c
+HEADERS = connect4.h
 
 all: $(NAME)
 
