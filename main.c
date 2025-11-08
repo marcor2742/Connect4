@@ -109,6 +109,17 @@ void draw_board(t_connect4 *game)
         ft_printf("──┴");
     }
     ft_printf("──┘\n");
+
+    // Print column numbers
+    ft_printf(" ");
+    for (j = 1; j <= game->columns; j++) {
+        ft_printf("%d", j);
+        if (j < 10)
+            ft_printf("  ");
+        else
+            ft_printf(" ");
+    }
+    ft_printf("\n");
 }
 
 int main(int argc, char *argv[])
