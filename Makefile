@@ -5,8 +5,8 @@ CFLAGS = -Wall -Wextra -Werror -I$(LIBFT_DIR)/include
 LIBFT_DIR = ./libft
 LIBFT = ./libft/libft.a
 
-SRCS = main.c
-HEADERS = connect4.h
+SRCS = main.c player.c
+HEADERS = 
 
 all: $(NAME)
 
@@ -29,8 +29,8 @@ fclean: clean
 
 re: fclean all
 
-debug: fclean $(LIBFT)
-	@$(CC) $(CFLAGS) -g $(SRCS) $(LIBFT) -o $(NAME)
+debug: fclean
+	@$(CC) $(CCFLAGS) -g $(SRCS) -o $(NAME)
 
 .PHONY: all clean fclean re debug
 .SILENT:
