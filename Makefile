@@ -2,21 +2,30 @@ NAME = Connect4
 CC = cc
 CFLAGS = -Wall -Wextra -Werror
 
-SRCS =
+LIBFT_DIR = ./libft
+LIBFT = ./libft/libft.a
+
+SRCS = main.c
 HEADERS = 
 
 all: $(NAME)
 
-$(NAME): $(SRCS) $(HEADERS)
+$(LIBFT):
+	@echo "Compiling libft..."
+	@$(MAKE) -C $(LIBFT_DIR) --quiet
+
+$(NAME): $(LIBFT) $(SRCS) $(HEADERS)
 	@echo "Compiling executable..."
-	@$(CC) $(CFLAGS) $(SRCS) -o $(NAME)
+	@$(CC) $(CFLAGS) $(SRCS) $(LIBFT) -o $(NAME)
 
 clean:
-	@echo "Nothing to clean..."
+	@echo "Removing object files..."
+	@$(MAKE) -C $(LIBFT_DIR) clean --quiet
 
 fclean: clean
-	@echo "Removing executable..."
+	@echo "Removing library and executables..."
 	@rm -rf $(NAME)
+	@$(MAKE) -C $(LIBFT_DIR) fclean --quiet
 
 re: fclean all
 
