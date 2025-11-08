@@ -71,12 +71,6 @@ void player_turn(t_connect4 *game)
 			close_all(game);
 		}
 	}
-    // if (!line)
-    // {
-    //     ft_printf("\n");
-    //     game->status = error;
-    //     close_all(game);
-    // }
 	for (int i = game->rows - 1; i >= 0; i--) {
 		if (game->board[i][column - 1] == EMPTY_CELL) {
 			game->board[i][column - 1] = PLAYER_CELL;
@@ -89,6 +83,7 @@ void draw_board(t_connect4 *game)
 {
     int i, j;
     // ' ', 'O', 'X'
+	// inserire numeri colonne
     
     ft_printf("┌");
     for (j = 0; j < game->columns - 1; j++) {
@@ -133,16 +128,16 @@ int main(int argc, char *argv[])
     t_connect4 game;
 
     if (ft_atoi(argv[1]) < 6 || ft_atoi(argv[2]) < 7) {
-        ft_printf("Error: Minimum size is 6 rows and 7 columns.\n");
+        ft_printf("Error: Size must be integers (rows) >= 6 and (columns) >= 7.\n");
         return 1;
     }
 
     game.rows = ft_atoi(argv[1]); //altezza
     game.columns = ft_atoi(argv[2]); //larghezza
-	if (game.rows > MAX_ROWS || game.columns > MAX_COLUMNS) {
-		ft_printf("Error: Maximum size is %d rows and %d columns.\n", MAX_ROWS, MAX_COLUMNS);
-		return 1;
-	}
+	// if (game.rows > MAX_ROWS || game.columns > MAX_COLUMNS) {
+	// 	ft_printf("Error: Maximum size is %d rows and %d columns.\n", MAX_ROWS, MAX_COLUMNS);
+	// 	return 1;
+	// }
 
     init_board(&game);
     game.status = ongoing;
@@ -153,18 +148,29 @@ int main(int argc, char *argv[])
 		//prendere input dai giocatori
 		player_turn(&game);
 
-        if (check_win_for(&game, PLAYER_CELL)) { game.status = lose; break; }
-        if (board_full(&game)) { game.status = draw; break; }
+//         if (check_win_for(&game, PLAYER_CELL)) { game.status = lose; break; }
+//         if (board_full(&game)) { game.status = draw; break; }
 
-        /* AI */
-        int ai_col = ai_choose_column(&game, 5); // depth = 5 example
-        if (ai_col >= 0) {
-            int r = make_move(&game, ai_col, AI_CELL);
-            (void)r;
-        }
-        if (check_win_for(&game, AI_CELL)) { game.status = win; break; }
-        if (board_full(&game)) { game.status = draw; break; }
+//         /* AI */
+//         int ai_col = ai_choose_column(&game, 5); // depth = 5 example
+//         if (ai_col >= 0) {
+//             int r = make_move(&game, ai_col, AI_CELL);
+//             (void)r;
+//         }
+//         if (check_win_for(&game, AI_CELL)) { game.status = win; break; }
+//         if (board_full(&game)) { game.status = draw; break; }
 
+		check_win(&game);
     }
+
+	draw_board(&game);
+	if (game.status == win)
+		ft_printf("You win!\n");
+	else if (game.status == lose)
+		ft_printf("You lose!\n");
+	else if (game.status == draw)
+		ft_printf("It's a draw!\n");
+	
+	close_all(&game);
     return 0;
 }
