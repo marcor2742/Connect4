@@ -133,25 +133,34 @@ int main(int argc, char *argv[])
 	// }
 
     init_board(&game);
+
+	srand(time(NULL));
+	game.current_turn = (rand() % 2 == 0) ? PLAYER : AI;
+
+	if (game.current_turn == PLAYER)
+        ft_printf("Inizi tu! 🔴\n");
+    else
+        ft_printf("Inizia l'IA! 🟡\n");
     game.status = ongoing;
+
     while (game.status == ongoing)
     {
 		draw_board(&game);
 
-		//prendere input dai giocatori
-		player_turn(&game);
-
-    	draw_board(&game);
-        check_result(&game);
-        if (game.status != ongoing)
-            break;
-
-        ai_choose_column(&game, 2); // depth = 2 example
+		if (game.current_turn == PLAYER) {
+			player_turn(&game);
+			game.current_turn = AI;
+		}
+		else {
+			ai_choose_column(&game, 2); // depth = 2 example
+			game.current_turn = PLAYER;
+		}
 
 		check_result(&game);
     }
 
 	draw_board(&game);
+
 	if (game.status == win)
 		ft_printf("You win!\n");
 	else if (game.status == lose)
