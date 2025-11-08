@@ -1,21 +1,17 @@
 #include "connect4.h"
 
-#define EMPTY_CELL '-'
-#define PLAYER_CELL 'X'
-#define AI_CELL 'O'
-
 void close_all(t_connect4 *game)
 {
     ft_free_char_mat(game->board);
-    exit(game->status);
+    exit(game->status == error ? 1 : 0);
 }
 
-void	draw_board(t_connect4 *game)
-{
-	for (int i = 0; i < game->rows; i++) {
-		ft_printf("%s\n", game->board[i]);
-	}
-}
+// void	draw_board(t_connect4 *game)
+// {
+// 	for (int i = 0; i < game->rows; i++) {
+// 		ft_printf("%s\n", game->board[i]);
+// 	}
+// }
 
 void alloc_board(t_connect4 *game)
 {
@@ -27,6 +23,7 @@ void alloc_board(t_connect4 *game)
         game->status = error;
         close_all(game);
     }
+
 	game->board[game->rows] = NULL;
 
     for (i = 0; i < game->rows; i++) {
@@ -62,17 +59,17 @@ void player_turn(t_connect4 *game)
 		{
 			column = ft_atoi(line);
 			free(line);
-			if (column >= 1 && column <= game->columns && game->board[0][column - 1] == EMPTY_CELL) {
+			if (column >= 1 && column <= game->columns && game->board[0][column - 1] == EMPTY_CELL)
 				break;
-			}
+			else
+				ft_printf("Colonna non valida. Riprova.\n");
 		}
-		if (!line)
+		else
 		{
 			ft_printf("\n");
 			game->status = error;
 			close_all(game);
 		}
-		ft_printf("Colonna non valida. Riprova.\n");
 	}
 	for (int i = game->rows - 1; i >= 0; i--) {
 		if (game->board[i][column - 1] == EMPTY_CELL) {
@@ -80,6 +77,45 @@ void player_turn(t_connect4 *game)
 			break;
 		}
 	}
+}
+
+void draw_board(t_connect4 *game)
+{
+    int i, j;
+    // ' ', 'O', 'X'
+	// inserire numeri colonne
+    
+    ft_printf("┌");
+    for (j = 0; j < game->columns - 1; j++) {
+        ft_printf("──┬");
+    }
+    ft_printf("──┐\n");
+    for (i = 0; i < game->rows; i++) {
+        ft_printf("│");
+        for (j = 0; j < game->columns; j++) {
+            if (game->board[i][j] == PLAYER_CELL)
+            ft_printf("🔴│");
+            else if (game->board[i][j] == AI_CELL)
+            ft_printf("🟡│");
+            else if (game->board[i][j] == EMPTY_CELL)
+            ft_printf("  │");
+            else
+            ft_printf("  │");
+        }
+        ft_printf("\n");
+        if (i != game->rows - 1) {
+            ft_printf("├");
+            for (j = 0; j < game->columns - 1; j++) {
+                ft_printf("──┼");
+            }
+            ft_printf("──┤\n");
+        }
+    }
+    ft_printf("└");
+    for (j = 0; j < game->columns - 1; j++) {
+        ft_printf("──┴");
+    }
+    ft_printf("──┘\n");
 }
 
 int main(int argc, char *argv[])
@@ -98,20 +134,23 @@ int main(int argc, char *argv[])
 
     game.rows = ft_atoi(argv[1]); //altezza
     game.columns = ft_atoi(argv[2]); //larghezza
+	if (game.rows > MAX_ROWS || game.columns > MAX_COLUMNS) {
+		ft_printf("Error: Maximum size is %d rows and %d columns.\n", MAX_ROWS, MAX_COLUMNS);
+		return 1;
+	}
 
-	init_board(&game);
-	game.status = ongoing;
+    init_board(&game);
+    game.status = ongoing;
     while (game.status == ongoing)
     {
 		draw_board(&game);
 
-		player_turn(&game);
 		//prendere input dai giocatori
+		player_turn(&game);
         //ia
 
-        //calcolare dove inserire il gettone (calcolare la riga ultima libera)
         //calcolare vittoria o pareggio
-    }
 
+    }
     return 0;
 }
