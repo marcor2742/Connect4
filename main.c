@@ -147,7 +147,18 @@ int main(int argc, char *argv[])
 
 		//prendere input dai giocatori
 		player_turn(&game);
-        //ia
+
+//         if (check_win_for(&game, PLAYER_CELL)) { game.status = lose; break; }
+//         if (board_full(&game)) { game.status = draw; break; }
+
+//         /* AI */
+//         int ai_col = ai_choose_column(&game, 5); // depth = 5 example
+//         if (ai_col >= 0) {
+//             int r = make_move(&game, ai_col, AI_CELL);
+//             (void)r;
+//         }
+//         if (check_win_for(&game, AI_CELL)) { game.status = win; break; }
+//         if (board_full(&game)) { game.status = draw; break; }
 
 		check_win(&game);
     }
