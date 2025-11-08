@@ -3,6 +3,9 @@
 
 # include "libft/include/libft.h"
 //# include "libft.h"
+#define MAX_ROWS 100
+#define MAX_COLUMNS 100
+
 #define EMPTY_CELL '-'
 #define PLAYER_CELL 'X'
 #define AI_CELL 'O'

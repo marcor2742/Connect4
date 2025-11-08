@@ -3,7 +3,7 @@
 void close_all(t_connect4 *game)
 {
     ft_free_char_mat(game->board);
-    exit(game->status);
+    exit(game->status == error ? 1 : 0);
 }
 
 // void	draw_board(t_connect4 *game)
@@ -59,11 +59,17 @@ void player_turn(t_connect4 *game)
 		{
 			column = ft_atoi(line);
 			free(line);
-			if (column >= 1 && column <= game->columns && game->board[0][column - 1] == EMPTY_CELL) {
+			if (column >= 1 && column <= game->columns && game->board[0][column - 1] == EMPTY_CELL)
 				break;
-			}
+			else
+				ft_printf("Colonna non valida. Riprova.\n");
 		}
-        ft_printf("Colonna non valida. Riprova.\n");
+		else
+		{
+			ft_printf("\n");
+			game->status = error;
+			close_all(game);
+		}
 	}
     // if (!line)
     // {
@@ -78,12 +84,6 @@ void player_turn(t_connect4 *game)
 		}
 	}
 }
-
-// void close_all(t_connect4 *game)
-// {
-//     ft_free_char_mat(game->board);
-//     exit(game->status);
-// }
 
 void draw_board(t_connect4 *game)
 {
@@ -105,7 +105,7 @@ void draw_board(t_connect4 *game)
             else if (game->board[i][j] == EMPTY_CELL)
             ft_printf("  │");
             else
-            ft_printf("  │", game->board[i][j]);
+            ft_printf("  │");
         }
         ft_printf("\n");
         if (i != game->rows - 1) {
@@ -139,6 +139,10 @@ int main(int argc, char *argv[])
 
     game.rows = ft_atoi(argv[1]); //altezza
     game.columns = ft_atoi(argv[2]); //larghezza
+	if (game.rows > MAX_ROWS || game.columns > MAX_COLUMNS) {
+		ft_printf("Error: Maximum size is %d rows and %d columns.\n", MAX_ROWS, MAX_COLUMNS);
+		return 1;
+	}
 
     init_board(&game);
     game.status = ongoing;
