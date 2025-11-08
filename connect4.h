@@ -35,5 +35,6 @@ typedef struct  s_connect4
 void draw_board(t_connect4 *game);
 void close_all(t_connect4 *game);
 void alloc_board(t_connect4 *game);
+void draw_in_window(t_connect4 *game, SDL_Renderer *renderer);
 
 #endif

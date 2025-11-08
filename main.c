@@ -85,6 +85,55 @@ void player_turn(t_connect4 *game)
 	}
 }
 
+void player_turn_graphics(t_connect4 *game, SDL_Renderer *renderer)
+{
+	while (1)
+    {
+        SDL_Event event;
+		// ft_printf("Inserisci la colonna (1-%d): ", game->columns);
+        while (SDL_PollEvent(&event))
+        {
+            if (event.type == SDL_EVENT_QUIT)
+            {
+                game->status = error;
+                close_all(game);
+            }
+            if (event.type == SDL_EVENT_KEY_DOWN)
+            {
+                SDL_Log("key pressed: %d", event.key.key);
+                if (event.key.key == 1073741903) // right
+                {
+                    if (game->hovered < game->columns)
+                    {
+                        game->hovered++;
+                        draw_in_window(game, renderer);
+                    }
+                }
+                if (event.key.key == 1073741904) // left
+                {
+                    if (game->hovered > 1)
+                    {
+                        game->hovered--;
+                        draw_in_window(game, renderer);
+                    }
+                }
+                if (event.key.key == 32)
+                {
+	                for (int i = game->rows - 1; i >= 0; i--)
+                    {
+	                	if (game->board[i][game->hovered - 1] == EMPTY_CELL)
+                        {
+	                		game->board[i][game->hovered - 1] = PLAYER_CELL;
+	                		break;
+	                	}
+	                }
+                    break;
+                }
+            }
+        }
+	}
+}
+
 void draw_board(t_connect4 *game)
 {
     int i, j;
@@ -151,9 +200,13 @@ void draw_in_window(t_connect4 *game, SDL_Renderer *renderer)
 
             /* fill empty cell */
             if (j + 1 == game->hovered)
-                SDL_SetRenderDrawColor(renderer, 100, 100, 100, 255);
+                SDL_SetRenderDrawColor(renderer, 100, 100, 100, 100);
             else
                 SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+
+            if (game->board[i][j] == PLAYER_CELL)
+                SDL_SetRenderDrawColor(renderer, 200, 100, 0, 255);
+
             SDL_RenderFillRect(renderer, &cell);
 
             /* cell border */
@@ -241,34 +294,6 @@ int main(int argc, char *argv[])
                 game.status = error;
                 close_all(&game);
             }
-            if (event.type == SDL_EVENT_KEY_DOWN)
-            {
-                // switch (event.key.key)
-                // {
-                //     case SDLK_RIGHT:
-                //     {
-                //         if (game.hovered < game.columns)
-                //             game.hovered++;
-
-                //     }
-                //     case SDLK_LEFT:
-                //     {
-                //         if (game.hovered > 1)
-                //             game.hovered--;
-                //     }
-                // }
-                SDL_Log("key pressed: %d", event.key.key);
-                if (event.key.key == 1073741903) // right
-                {
-                    if (game.hovered < game.columns)
-                             game.hovered++;
-                }
-                if (event.key.key == 1073741904) // left
-                {
-                    if (game.hovered > 1)
-                           game.hovered--;
-                }
-            }
         }
 
         if (!has_graphics)
@@ -279,6 +304,8 @@ int main(int argc, char *argv[])
 		//prendere input dai giocatori
 		if (!has_graphics)
             player_turn(&game);
+        else
+            player_turn_graphics(&game, renderer);
         //ia
 
         //calcolare vittoria o pareggio
