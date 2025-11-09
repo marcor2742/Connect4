@@ -53,7 +53,7 @@ void player_turn_graphics(t_connect4 *game, SDL_Renderer *renderer)
 	while (1)
     {
         SDL_Event event;
-		// ft_printf("Inserisci la colonna (1-%d): ", game->columns);
+
         while (SDL_PollEvent(&event))
         {
             if (event.type == SDL_EVENT_QUIT)
@@ -63,7 +63,6 @@ void player_turn_graphics(t_connect4 *game, SDL_Renderer *renderer)
             }
             if (event.type == SDL_EVENT_KEY_DOWN)
             {
-                //SDL_Log("key pressed: %d", event.key.key);
                 if (event.key.key == 1073741903) // right
                 {
                     if (game->hovered < game->columns)
@@ -76,17 +75,15 @@ void player_turn_graphics(t_connect4 *game, SDL_Renderer *renderer)
                     if (game->hovered > 1)
                     {
                         game->hovered--;
-                        //draw_in_window(game, renderer);
                     }
                 }
-                if (event.key.key == 32)
+                if (event.key.key == 32) // space
                 {
 	                for (int i = game->rows - 1; i >= 0; i--)
                     {
 	                	if (game->board[i][game->hovered - 1] == EMPTY_CELL)
                         {
                             make_move(game, game->hovered - 1, PLAYER_CELL);
-	                		//game->board[i][game->hovered - 1] = PLAYER_CELL;
 	                		break;
 	                	}
 	                }
@@ -98,11 +95,25 @@ void player_turn_graphics(t_connect4 *game, SDL_Renderer *renderer)
 	}
 }
 
+void DrawFilledCircle(SDL_Renderer *renderer, int centreX, int centreY, int radius)
+{
+    if (radius <= 0) return;
+    int r2 = radius * radius;
+    for (int dy = -radius; dy <= radius; ++dy) {
+        int y = centreY + dy;
+        int rem = r2 - dy * dy;
+        if (rem < 0) continue;
+        int dx = 0;
+        while ((dx + 1) * (dx + 1) <= rem) ++dx;
+        int x1 = centreX - dx;
+        int x2 = centreX + dx;
+        SDL_RenderLine(renderer, x1, y, x2, y);
+    }
+}
+
 void draw_board(t_connect4 *game)
 {
     int i, j;
-    // ' ', 'O', 'X'
-	// inserire numeri colonne
     
     ft_printf("┌");
     for (j = 0; j < game->columns - 1; j++) {
@@ -113,9 +124,9 @@ void draw_board(t_connect4 *game)
         ft_printf("│");
         for (j = 0; j < game->columns; j++) {
             if (game->board[i][j] == PLAYER_CELL)
-            ft_printf("🔴│");
+            ft_printf("🔵│");
             else if (game->board[i][j] == AI_CELL)
-            ft_printf("🟡│");
+            ft_printf("🔴│");
             else if (game->board[i][j] == EMPTY_CELL)
             ft_printf("  │");
             else
@@ -148,8 +159,6 @@ void draw_board(t_connect4 *game)
     ft_printf("\n");
 }
 
-// void draw
-
 void draw_in_window(t_connect4 *game, SDL_Renderer *renderer)
 {
     int width;
@@ -164,8 +173,6 @@ void draw_in_window(t_connect4 *game, SDL_Renderer *renderer)
     SDL_SetRenderDrawColor(renderer, 20, 20, 20, 255);
     SDL_RenderClear(renderer);
 
-    // draw_board(game);
-
     for (int i = 0; i < game->rows; i++)
     {
         for (int j = 0; j < game->columns; j++)
@@ -176,22 +183,28 @@ void draw_in_window(t_connect4 *game, SDL_Renderer *renderer)
             cell.w = cell_w - pad * 2;
             cell.h = cell_h - pad * 2;
 
-            /* fill empty cell */
+            // fill empty cell 
             if (j + 1 == game->hovered)
                 SDL_SetRenderDrawColor(renderer, 100, 100, 100, 100);
             else
                 SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-
-            if (game->board[i][j] == PLAYER_CELL)
-                SDL_SetRenderDrawColor(renderer, 200, 100, 0, 255);
-            else if (game->board[i][j] == AI_CELL)
-                SDL_SetRenderDrawColor(renderer, 0, 100, 200, 255);
             SDL_RenderFillRect(renderer, &cell);
 
-            /* cell border */
+            // cell border
             SDL_SetRenderDrawColor(renderer, 200, 200, 200, 255);
             SDL_FRect border = { j * cell_w, i * cell_h, cell_w, cell_h };
             SDL_RenderRect(renderer, &border);
+
+            if (game->board[i][j] == PLAYER_CELL)
+            {
+                SDL_SetRenderDrawColor(renderer, 0, 0, 200, 255);
+                DrawFilledCircle(renderer, cell_w * j + 25, cell_h * i + 25, 23);
+            }
+            else if (game->board[i][j] == AI_CELL)
+            {
+                SDL_SetRenderDrawColor(renderer, 200, 0, 0, 255);
+                DrawFilledCircle(renderer, cell_w * j + 25, cell_h * i + 25, 23);
+            }
         }
     }
     SDL_RenderPresent(renderer);
@@ -213,10 +226,6 @@ int main(int argc, char *argv[])
 
     game.rows = ft_atoi(argv[1]); //altezza
     game.columns = ft_atoi(argv[2]); //larghezza
-	// if (game.rows > MAX_ROWS || game.columns > MAX_COLUMNS) {
-	// 	ft_printf("Error: Maximum size is %d rows and %d columns.\n", MAX_ROWS, MAX_COLUMNS);
-	// 	return 1;
-	// }
 
     init_board(&game);
 
@@ -243,9 +252,8 @@ int main(int argc, char *argv[])
     ///////////////////////////////////////////////////////////////////////
     if (game.has_graphics)
     {
-        SDL_Init(SDL_INIT_VIDEO);   // Initialize SDL3
+        SDL_Init(SDL_INIT_VIDEO);
         
-        // Create an application window with the following settings:
         game.window = SDL_CreateWindow(
             "Connect4",                  // window title
             game.columns * 50,           // width, in pixels
@@ -273,47 +281,22 @@ int main(int argc, char *argv[])
 
     while (game.status == ongoing)
     {
-        //SDL_Event event;
-
-        // while (SDL_PollEvent(&event))
-        // {
-        //     if (event.type == SDL_EVENT_QUIT)
-        //     {
-        //         game.status = error;
-        //         close_all(&game);
-        //     }
-        // }
-
-        if (!game.has_graphics)
-		    draw_board(&game);
-        else
+        draw_board(&game);
+        if (game.has_graphics)
             draw_in_window(&game, game.renderer);
 
-		//prendere input dai giocatori
-//         if (!game.has_graphics)
-// 		        player_turn(&game);
-//         else
-//             player_turn_graphics(&game, game.renderer);
-
-    	//draw_board(&game);
-//         check_result(&game);
-//         if (game.status != ongoing)
-//             break;
-
-//         ai_choose_column(&game, 2); // depth = 2 example
-		if (game.current_turn == PLAYER) {
-			//player_turn(&game);
-        if (!game.has_graphics)
-		        player_turn(&game);
-        else
-            player_turn_graphics(&game, game.renderer);
-			game.current_turn = AI;
+		if (game.current_turn == PLAYER)
+        {
+            if (!game.has_graphics)
+                    player_turn(&game);
+            else
+                player_turn_graphics(&game, game.renderer);
+            game.current_turn = AI;
 		}
 		else {
 			ai_choose_column(&game, 2); // depth = 2 example
 			game.current_turn = PLAYER;
 		}
-
 		check_result(&game);
     }
 
