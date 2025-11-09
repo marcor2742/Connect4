@@ -294,7 +294,7 @@ int main(int argc, char *argv[])
             game.current_turn = AI;
 		}
 		else {
-			ai_choose_column(&game, 2); // depth = 2 example
+			ai_choose_column(&game, 4); // depth = 4
 			game.current_turn = PLAYER;
 		}
 		check_result(&game);
