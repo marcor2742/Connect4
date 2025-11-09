@@ -15,49 +15,6 @@ static int count_direction(t_connect4 *game, int row, int col, int dr, int dc, c
     return count;
 }
 
-// void check_win(t_connect4 *game)
-// {
-//     int row = game->last_move.row;
-//     int col = game->last_move.column;
-//     char player = game->board[row][col];
- 
-//     int directions[4][2] = {
-//         {0, 1},
-//         {1, 0},
-//         {1, 1},
-//         {1, -1}
-//     };
-    
-//     for (int d = 0; d < 4; d++)
-//     {
-//         int count = 1;
-//         int dr = directions[d][0];
-//         int dc = directions[d][1];
-        
-//         count += count_direction(game, row, col, dr, dc, player);
-//         count += count_direction(game, row, col, -dr, -dc, player);
-        
-//         if (count >= 4)
-//         {
-//             if (player == PLAYER_CELL)
-//                 game->status = win;
-//             else if (player == AI_CELL)
-//                 game->status = lose;
-//             return;
-//         }
-//     }
-
-//     bool full = true;
-//     for (int j = 0; j < game->columns; j++) {
-//         if (game->board[0][j] == EMPTY_CELL) {
-//             full = false;
-//             break;
-//         }
-//     }
-//     if (full)
-//         game->status = draw;
-// }
-
 int check_win(t_connect4 *game)
 {
     int row = game->last_move.row;
@@ -108,19 +65,6 @@ void check_result(t_connect4 *game)
     if (full)
         game->status = draw;
 }
-
-
-// static void move_player(t_connect4 *game, int columnIndex)
-// {
-// 	for (int i = game->rows - 1; i >= 0; i--) {
-// 		if (game->board[i][columnIndex - 1] == EMPTY_CELL) {
-// 			game->board[i][columnIndex - 1] = PLAYER_CELL;
-// 			game->last_move.row = i;
-// 			game->last_move.column = columnIndex - 1;
-// 			break;
-// 		}
-// 	}
-// }
 
 void player_turn(t_connect4 *game)
 {
