@@ -26,6 +26,29 @@ int make_move(t_connect4 *game, int col, char symbol)
     return -1;
 }
 
+static int check_direction(t_connect4 *game, int r, int c, int dr, int dc, char s)
+{
+    for (int i = 0; i < 4; ++i) {
+        int rr = r + i*dr, cc = c + i*dc;
+        if (!in_bounds(game, rr, cc) || game->board[rr][cc] != s) return 0;
+    }
+    return 1;
+}
+
+int check_win_for(t_connect4 *game, char s)
+{
+    for (int r = 0; r < game->rows; ++r) {
+        for (int c = 0; c < game->columns; ++c) {
+            if (game->board[r][c] != s) continue;
+            if (check_direction(game, r, c, 0, 1, s)) return 1;
+            if (check_direction(game, r, c, 1, 0, s)) return 1;
+            if (check_direction(game, r, c, 1, 1, s)) return 1;
+            if (check_direction(game, r, c, 1, -1, s)) return 1;
+        }
+    }
+    return 0;
+}
+
 void undo_move(t_connect4 *game, int row, int col)
 {
     if (in_bounds(game, row, col))
@@ -97,45 +120,132 @@ int evaluate(t_connect4 *game)
 
 static int minimax_ab(t_connect4 *game, int depth, int alpha, int beta, int maximizing)
 {
-    if (check_win(game)) return  WIN_SCORE;
-    if (check_win(game)) return -WIN_SCORE;
+    // Controlla stati terminali PRIMA di fare altre operazioni
+    if (check_win_for(game, AI_CELL)) return WIN_SCORE + depth;
+    if (check_win_for(game, PLAYER_CELL)) return -WIN_SCORE - depth;
     if (depth == 0 || board_full(game)) return evaluate(game);
 
+    // Ordina le colonne dal centro verso l'esterno
+    int columns[MAX_COLUMNS];
+    int valid_count = 0;
+    int center = game->columns / 2;
+    
+    if (game->board[0][center] == EMPTY_CELL) {
+        columns[valid_count++] = center;
+    }
+    
+    for (int offset = 1; offset <= center; offset++) {
+        int right_col = center + offset;
+        if (right_col < game->columns && game->board[0][right_col] == EMPTY_CELL) {
+            columns[valid_count++] = right_col;
+        }
+        
+        int left_col = center - offset;
+        if (left_col >= 0 && game->board[0][left_col] == EMPTY_CELL) {
+            columns[valid_count++] = left_col;
+        }
+    }
+    
+    if (valid_count == 0) return evaluate(game);
+
     if (maximizing) {
-        int value = INT_MIN;
-        for (int c = 0; c < game->columns; ++c) {
-            if (game->board[0][c] != EMPTY_CELL) continue;
+        int max_eval = INT_MIN;
+        for (int i = 0; i < valid_count; ++i) {
+            int c = columns[i];
             int r = make_move(game, c, AI_CELL);
             if (r == -1) continue;
-            int score = minimax_ab(game, depth - 1, alpha, beta, 0);
+            
+            int eval = minimax_ab(game, depth - 1, alpha, beta, 0);
             undo_move(game, r, c);
-            if (score > value) value = score;
-            if (value > alpha) alpha = value;
-            if (beta <= alpha) break;
+            
+            max_eval = (eval > max_eval) ? eval : max_eval;
+            alpha = (alpha > eval) ? alpha : eval;
+            
+            if (beta <= alpha) {
+                break; // Alpha-beta pruning
+            }
         }
-        return value;
+        return max_eval;
     } else {
-        int value = INT_MAX;
-        for (int c = 0; c < game->columns; ++c) {
-            if (game->board[0][c] != EMPTY_CELL) continue;
+        int min_eval = INT_MAX;
+        for (int i = 0; i < valid_count; ++i) {
+            int c = columns[i];
             int r = make_move(game, c, PLAYER_CELL);
             if (r == -1) continue;
-            int score = minimax_ab(game, depth - 1, alpha, beta, 1);
+            
+            int eval = minimax_ab(game, depth - 1, alpha, beta, 1);
             undo_move(game, r, c);
-            if (score < value) value = score;
-            if (value < beta) beta = value;
-            if (beta <= alpha) break;
+            
+            min_eval = (eval < min_eval) ? eval : min_eval;
+            beta = (beta < eval) ? beta : eval;
+            
+            if (beta <= alpha) {
+                break; // Alpha-beta pruning
+            }
         }
-        return value;
+        return min_eval;
     }
 }
 
 void ai_choose_column(t_connect4 *game, int depth)
 {
-    int best_col = -1;
-    int best_score = INT_MIN;
+    // Prima controlla se può vincere immediatamente
     for (int col = 0; col < game->columns; ++col) {
         if (game->board[0][col] != EMPTY_CELL) continue;
+        int row = make_move(game, col, AI_CELL);
+        if (row == -1) continue;
+        if (check_win_for(game, AI_CELL)) {
+            // Vittoria immediata, non serve undo
+            return;
+        }
+        undo_move(game, row, col);
+    }
+    
+    // Poi controlla se deve bloccare una vittoria del player
+    for (int col = 0; col < game->columns; ++col) {
+        if (game->board[0][col] != EMPTY_CELL) continue;
+        int row = make_move(game, col, PLAYER_CELL);
+        if (row == -1) continue;
+        if (check_win_for(game, PLAYER_CELL)) {
+            undo_move(game, row, col);
+            // Blocca la vittoria del player
+            make_move(game, col, AI_CELL);
+            return;
+        }
+        undo_move(game, row, col);
+    }
+    
+    // Ordina le colonne dal centro verso l'esterno
+    int columns[MAX_COLUMNS];
+    int valid_count = 0;
+    int center = game->columns / 2;
+    
+    // Prima aggiungi il centro (se valido)
+    if (game->board[0][center] == EMPTY_CELL) {
+        columns[valid_count++] = center;
+    }
+    
+    // Poi alterna destra e sinistra
+    for (int offset = 1; offset <= center; offset++) {
+        // A destra del centro
+        int right_col = center + offset;
+        if (right_col < game->columns && game->board[0][right_col] == EMPTY_CELL) {
+            columns[valid_count++] = right_col;
+        }
+        
+        // A sinistra del centro
+        int left_col = center - offset;
+        if (left_col >= 0 && game->board[0][left_col] == EMPTY_CELL) {
+            columns[valid_count++] = left_col;
+        }
+    }
+    
+    int best_col = -1;
+    int best_score = INT_MIN;
+    
+    // Ora valuta le colonne in ordine randomizzato
+    for (int i = 0; i < valid_count; ++i) {
+        int col = columns[i];
         int row = make_move(game, col, AI_CELL);
         if (row == -1) continue;
         int score = minimax_ab(game, depth - 1, INT_MIN, INT_MAX, 0);
@@ -145,7 +255,7 @@ void ai_choose_column(t_connect4 *game, int depth)
             best_col = col;
         }
     }
-    // return best_col;
+    
     if (best_col >= 0) {
         int r = make_move(game, best_col, AI_CELL);
         (void)r;
