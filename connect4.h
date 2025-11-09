@@ -3,6 +3,13 @@
 
 # include "libft/include/libft.h"
 //# include "libft.h"
+
+#include <SDL3/SDL.h>
+#include <SDL3/SDL_main.h>
+#include <stdlib.h>
+#include <time.h>
+
+
 #define MAX_ROWS 100
 #define MAX_COLUMNS 100
 
@@ -19,6 +26,12 @@ typedef enum    e_status
     error
 }               e_status;
 
+typedef enum e_turn
+{
+    PLAYER,
+	AI
+}	t_turn;
+
 typedef struct  s_move
 {
 	int row;
@@ -27,9 +40,14 @@ typedef struct  s_move
 
 typedef struct  s_connect4
 {
+    SDL_Window *window;
+    SDL_Renderer *renderer;
+    bool has_graphics;
     int rows;
     int columns;
     char **board;
+    int hovered;
+    t_turn current_turn;
     t_move last_move;
     e_status status;
 }               t_connect4;
@@ -37,9 +55,19 @@ typedef struct  s_connect4
 void draw_board(t_connect4 *game);
 void close_all(t_connect4 *game);
 void alloc_board(t_connect4 *game);
+void draw_in_window(t_connect4 *game, SDL_Renderer *renderer);
 
-int count_direction(t_connect4 *game, int row, int col, int dr, int dc, char player);
-void check_win(t_connect4 *game);
+
+int make_move(t_connect4 *game, int col, char symbol); /* returns row or -1 */
+void undo_move(t_connect4 *game, int row, int col);
+int check_win_for(t_connect4 *game, char symbol);
+int board_full(t_connect4 *game);
+int evaluate(t_connect4 *game);
+void ai_choose_column(t_connect4 *game, int depth);
+
+int check_win(t_connect4 *game);
+void check_result(t_connect4 *game);
 void player_turn(t_connect4 *game);
+
 
 #endif
